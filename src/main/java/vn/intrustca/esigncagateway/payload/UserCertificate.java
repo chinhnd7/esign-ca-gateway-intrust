@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserCertificate {
     @JsonProperty
-    private String cert_id;
+    private int cert_id;
     private String cert_data;
     private ChainData chain_data;
     private String serial_number;
