@@ -40,7 +40,6 @@ public interface ResponseUtil {
         BaseDataResponse response = new BaseDataResponse();
         response.setResponseCode("400");
         response.setResponseMessage(exception.getMessage());
-        response.setResponseEntityMessages(exception.getErrors());
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -69,12 +68,11 @@ public interface ResponseUtil {
         BaseDataResponse response = new BaseDataResponse();
         response.setResponseCode("400");
         response.setResponseMessage("failed");
-        List<ValidationErrorResponse> errors = new ArrayList();
 
         ArrayList errorMessageParams;
         ConstraintViolation cv;
         String errorMessage;
-        for(Iterator var5 = exception.getConstraintViolations().iterator(); var5.hasNext(); errors.add(new ValidationErrorResponse(cv.getPropertyPath().toString(), cv.getMessageTemplate(), errorMessage, errorMessageParams))) {
+        for(Iterator var5 = exception.getConstraintViolations().iterator(); var5.hasNext(); ) {
             cv = (ConstraintViolation)var5.next();
             errorMessageParams = null;
             errorMessage = MessageUtil.getMessage(cv.getMessageTemplate());
@@ -97,7 +95,6 @@ public interface ResponseUtil {
             }
         }
 
-        response.setResponseEntityMessages(errors);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -108,7 +105,7 @@ public interface ResponseUtil {
     static ResponseEntity wrap(HttpHeaders headers, Object object) {
         BaseDataResponse response = new BaseDataResponse();
         response.setResponseCode("200");
-        response.setResponseMessage("successful");
+        response.setResponseMessage("Success");
         response.setData(object);
         return new ResponseEntity(response, headers, HttpStatus.OK);
     }

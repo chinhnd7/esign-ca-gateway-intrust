@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetCertUserRequest {
+public class RaGetCertRequest {
 
     @JsonProperty("user_id")
     private String userId;

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import vn.intrustca.esigncagateway.payload.ChainData;
 import vn.intrustca.esigncagateway.payload.RaUserCertificate;
 import vn.intrustca.esigncagateway.payload.UserCertificate;
-import vn.intrustca.esigncagateway.payload.request.GetCertUserRequest;
+import vn.intrustca.esigncagateway.payload.request.RaGetCertRequest;
 import vn.intrustca.esigncagateway.payload.request.GetCertRequest;
 import vn.intrustca.esigncagateway.payload.request.RaLoginRequest;
 import vn.intrustca.esigncagateway.payload.response.GetCertResponse;
@@ -47,8 +47,8 @@ public class GatewayService {
 
             RaLoginResponse loginResponse = restHelper.callService("auth/signin", loginRequest, null, httpRequest, RaLoginResponse.class);
             if(loginResponse.getCode() == 0){
-                GetCertUserRequest getCertUserRequest = new GetCertUserRequest(request.getUserId());
-                List<RaUserCertificate> responseCerts = restHelper.getCerts("getcertuser", getCertUserRequest, loginResponse.getAccessToken(), httpRequest);
+                RaGetCertRequest raGetCertRequest = new RaGetCertRequest(request.getUserId());
+                List<RaUserCertificate> responseCerts = restHelper.getCerts("getcertuser", raGetCertRequest, loginResponse.getAccessToken(), httpRequest);
                 response.setUserCertificates(ServiceUtils.adaptRaResponseToNeac(responseCerts));
                 response.setTransactionId(request.getTransactionId());
             }else {

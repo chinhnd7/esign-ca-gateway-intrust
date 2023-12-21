@@ -1,19 +1,13 @@
 package vn.intrustca.esigncagateway.utils;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import vn.intrustca.esigncagateway.utils.exception.ValidationErrorResponse;
-
-
-import java.util.List;
 
 public class BaseDataResponse<T> {
     @JsonProperty("status_code")
     private String responseCode;
     @JsonProperty("message")
     private String responseMessage;
-    @JsonProperty("responseEntityMessages")
-    private List<ValidationErrorResponse> responseEntityMessages;
+
     @JsonProperty("data")
     private T data;
 
@@ -23,10 +17,6 @@ public class BaseDataResponse<T> {
 
     public String getResponseMessage() {
         return this.responseMessage;
-    }
-
-    public List<ValidationErrorResponse> getResponseEntityMessages() {
-        return this.responseEntityMessages;
     }
 
     public T getData() {
@@ -41,11 +31,6 @@ public class BaseDataResponse<T> {
     @JsonProperty("message")
     public void setResponseMessage(String responseMessage) {
         this.responseMessage = responseMessage;
-    }
-
-    @JsonProperty("responseEntityMessages")
-    public void setResponseEntityMessages(List<ValidationErrorResponse> responseEntityMessages) {
-        this.responseEntityMessages = responseEntityMessages;
     }
 
     @JsonProperty("data")
@@ -87,16 +72,6 @@ public class BaseDataResponse<T> {
                     return false;
                 }
 
-                Object this$responseEntityMessages = this.getResponseEntityMessages();
-                Object other$responseEntityMessages = other.getResponseEntityMessages();
-                if (this$responseEntityMessages == null) {
-                    if (other$responseEntityMessages != null) {
-                        return false;
-                    }
-                } else if (!this$responseEntityMessages.equals(other$responseEntityMessages)) {
-                    return false;
-                }
-
                 Object this$data = this.getData();
                 Object other$data = other.getData();
                 if (this$data == null) {
@@ -123,21 +98,18 @@ public class BaseDataResponse<T> {
         result = result * 59 + ($responseCode == null ? 43 : $responseCode.hashCode());
         Object $responseMessage = this.getResponseMessage();
         result = result * 59 + ($responseMessage == null ? 43 : $responseMessage.hashCode());
-        Object $responseEntityMessages = this.getResponseEntityMessages();
-        result = result * 59 + ($responseEntityMessages == null ? 43 : $responseEntityMessages.hashCode());
         Object $data = this.getData();
         result = result * 59 + ($data == null ? 43 : $data.hashCode());
         return result;
     }
 
     public String toString() {
-        return "BaseDataResponse(responseCode=" + this.getResponseCode() + ", responseMessage=" + this.getResponseMessage() + ", responseEntityMessages=" + this.getResponseEntityMessages() + ", data=" + this.getData() + ")";
+        return "BaseDataResponse(responseCode=" + this.getResponseCode() + ", responseMessage=" + this.getResponseMessage() + ", data=" + this.getData() + ")";
     }
 
-    public BaseDataResponse(String responseCode, String responseMessage, List<ValidationErrorResponse> responseEntityMessages, T data) {
+    public BaseDataResponse(String responseCode, String responseMessage, T data) {
         this.responseCode = responseCode;
         this.responseMessage = responseMessage;
-        this.responseEntityMessages = responseEntityMessages;
         this.data = data;
     }
 

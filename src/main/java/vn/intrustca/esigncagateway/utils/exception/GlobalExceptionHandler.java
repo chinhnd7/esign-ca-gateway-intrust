@@ -24,8 +24,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         // Thực tế người ta dùng logger
         logger.error("Exception occurred", e);
         Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("responseMessage", "Server Error");
-        errorDetails.put("responseCode", 500);
+        errorDetails.put("message", "Server Error");
+        errorDetails.put("status_code", 500);
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ObjectMapper mapper = new ObjectMapper();
