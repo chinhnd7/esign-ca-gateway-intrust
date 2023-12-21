@@ -1,6 +1,7 @@
 package vn.intrustca.esigncagateway.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +45,7 @@ public class GatewayService {
 
             if(loginResponse.getCode() == 0){
                 GetCertUserRequest getCertUserRequest = new GetCertUserRequest(request.getUserId());
-                JSONOb responseCerts = restHelper.getCerts("getcertuser", getCertUserRequest, loginResponse.getAccessToken(), httpRequest, RaGetCertResponse.class);
+                JSONObject responseCerts = restHelper.getCerts("getcertuser", getCertUserRequest, loginResponse.getAccessToken(), httpRequest, JSONObject.class);
 
             }else {
                 throw ServiceExceptionBuilder.newBuilder()

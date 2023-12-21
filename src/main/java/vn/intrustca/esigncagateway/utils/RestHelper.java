@@ -6,19 +6,17 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import vn.intrustca.esigncagateway.utils.exception.AppException;
 import vn.intrustca.esigncagateway.utils.exception.ValidationError;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
@@ -74,10 +72,10 @@ public class RestHelper {
         return null;
     }
 
-    public <T, G> T getCerts(String apiPath, G request, String token, HttpServletRequest httpServletRequest,  JSONObject.class) {
+    public <G> JSONObject getCerts(String apiPath, G request, String token, HttpServletRequest httpServletRequest, Class<JSONObject> jsonObjectClass) {
         ResponseEntity<JSONObject> responseEntity;
         try{
-            responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createAuthHttpEntity(request, token, httpServletRequest), JSONObject.class);
+            responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createAuthHttpEntity(request, token, httpServletRequest), jsonObjectClass);
             if (responseEntity.getStatusCodeValue() == 200) {
                 JSONObject response = responseEntity.getBody();
                 System.out.println("-------------------------" + response);
