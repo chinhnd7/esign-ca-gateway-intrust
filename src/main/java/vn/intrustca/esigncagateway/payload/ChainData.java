@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ChainData {
-    private String caCert;
-    private String rootCert;
+    private String ca_cert;
+    private String root_cert;
 }

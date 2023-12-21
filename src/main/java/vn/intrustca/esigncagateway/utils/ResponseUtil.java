@@ -109,7 +109,7 @@ public interface ResponseUtil {
         BaseDataResponse response = new BaseDataResponse();
         response.setResponseCode("200");
         response.setResponseMessage("successful");
-        response.setBody(object);
+        response.setData(object);
         return new ResponseEntity(response, headers, HttpStatus.OK);
     }
 

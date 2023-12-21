@@ -8,14 +8,14 @@ import vn.intrustca.esigncagateway.utils.exception.ValidationErrorResponse;
 import java.util.List;
 
 public class BaseDataResponse<T> {
-    @JsonProperty("responseCode")
+    @JsonProperty("status_code")
     private String responseCode;
-    @JsonProperty("responseMessage")
+    @JsonProperty("message")
     private String responseMessage;
     @JsonProperty("responseEntityMessages")
     private List<ValidationErrorResponse> responseEntityMessages;
-    @JsonProperty("body")
-    private T body;
+    @JsonProperty("data")
+    private T data;
 
     public String getResponseCode() {
         return this.responseCode;
@@ -29,16 +29,16 @@ public class BaseDataResponse<T> {
         return this.responseEntityMessages;
     }
 
-    public T getBody() {
-        return this.body;
+    public T getData() {
+        return this.data;
     }
 
-    @JsonProperty("responseCode")
+    @JsonProperty("status_code")
     public void setResponseCode(String responseCode) {
         this.responseCode = responseCode;
     }
 
-    @JsonProperty("responseMessage")
+    @JsonProperty("message")
     public void setResponseMessage(String responseMessage) {
         this.responseMessage = responseMessage;
     }
@@ -48,9 +48,9 @@ public class BaseDataResponse<T> {
         this.responseEntityMessages = responseEntityMessages;
     }
 
-    @JsonProperty("body")
-    public void setBody(T body) {
-        this.body = body;
+    @JsonProperty("data")
+    public void setData(T data) {
+        this.data = data;
     }
 
     public boolean equals(Object o) {
@@ -97,13 +97,13 @@ public class BaseDataResponse<T> {
                     return false;
                 }
 
-                Object this$body = this.getBody();
-                Object other$body = other.getBody();
-                if (this$body == null) {
-                    if (other$body != null) {
+                Object this$data = this.getData();
+                Object other$data = other.getData();
+                if (this$data == null) {
+                    if (other$data != null) {
                         return false;
                     }
-                } else if (!this$body.equals(other$body)) {
+                } else if (!this$data.equals(other$data)) {
                     return false;
                 }
 
@@ -125,20 +125,20 @@ public class BaseDataResponse<T> {
         result = result * 59 + ($responseMessage == null ? 43 : $responseMessage.hashCode());
         Object $responseEntityMessages = this.getResponseEntityMessages();
         result = result * 59 + ($responseEntityMessages == null ? 43 : $responseEntityMessages.hashCode());
-        Object $body = this.getBody();
-        result = result * 59 + ($body == null ? 43 : $body.hashCode());
+        Object $data = this.getData();
+        result = result * 59 + ($data == null ? 43 : $data.hashCode());
         return result;
     }
 
     public String toString() {
-        return "BaseDataResponse(responseCode=" + this.getResponseCode() + ", responseMessage=" + this.getResponseMessage() + ", responseEntityMessages=" + this.getResponseEntityMessages() + ", body=" + this.getBody() + ")";
+        return "BaseDataResponse(responseCode=" + this.getResponseCode() + ", responseMessage=" + this.getResponseMessage() + ", responseEntityMessages=" + this.getResponseEntityMessages() + ", data=" + this.getData() + ")";
     }
 
-    public BaseDataResponse(String responseCode, String responseMessage, List<ValidationErrorResponse> responseEntityMessages, T body) {
+    public BaseDataResponse(String responseCode, String responseMessage, List<ValidationErrorResponse> responseEntityMessages, T data) {
         this.responseCode = responseCode;
         this.responseMessage = responseMessage;
         this.responseEntityMessages = responseEntityMessages;
-        this.body = body;
+        this.data = data;
     }
 
     public BaseDataResponse() {

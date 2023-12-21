@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import vn.intrustca.esigncagateway.payload.request.GetCertUserRequest;
 import vn.intrustca.esigncagateway.payload.request.GetCertRequest;
 import vn.intrustca.esigncagateway.payload.request.RaLoginRequest;
-import vn.intrustca.esigncagateway.payload.response.CertificateResponse;
+import vn.intrustca.esigncagateway.payload.response.GetCertResponse;
+import vn.intrustca.esigncagateway.payload.response.RaGetCertResponse;
 import vn.intrustca.esigncagateway.payload.response.RaLoginResponse;
 import vn.intrustca.esigncagateway.utils.RestHelper;
 import vn.intrustca.esigncagateway.utils.exception.ServiceException;
@@ -33,8 +33,8 @@ public class GatewayService {
     @Value("${ra.password}")
     private String password;
 
-    public CertificateResponse getCert(GetCertRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
-        CertificateResponse response = new CertificateResponse();
+    public GetCertResponse getCerts(GetCertRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
+        GetCertResponse response = new GetCertResponse();
         try {
             RaLoginRequest loginRequest = new RaLoginRequest(userName, password);
             RestHelper restHelper = new RestHelper();
@@ -43,7 +43,8 @@ public class GatewayService {
             RaLoginResponse loginResponse = restHelper.callService("auth/signin", loginRequest, null, httpRequest, RaLoginResponse.class);
 
             if(loginResponse.getCode() == 0){
-                response = restHelper.getCert("get_cert", request, loginResponse.getAccessToken(), httpRequest, CertificateResponse.class);
+                GetCertUserRequest getCertUserRequest = new GetCertUserRequest(request.getUserId());
+                JSONOb responseCerts = restHelper.getCerts("getcertuser", getCertUserRequest, loginResponse.getAccessToken(), httpRequest, RaGetCertResponse.class);
 
             }else {
                 throw ServiceExceptionBuilder.newBuilder()

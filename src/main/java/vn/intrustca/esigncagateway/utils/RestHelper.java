@@ -74,12 +74,12 @@ public class RestHelper {
         return null;
     }
 
-    public <T, G> T getCert(String apiPath, G request, String token, HttpServletRequest httpServletRequest,  Class<T> responseClass) {
-        ResponseEntity<T> responseEntity;
+    public <T, G> T getCerts(String apiPath, G request, String token, HttpServletRequest httpServletRequest,  JSONObject.class) {
+        ResponseEntity<JSONObject> responseEntity;
         try{
-            responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createAuthHttpEntity(request, token, httpServletRequest), responseClass);
+            responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createAuthHttpEntity(request, token, httpServletRequest), JSONObject.class);
             if (responseEntity.getStatusCodeValue() == 200) {
-                T response = responseEntity.getBody();
+                JSONObject response = responseEntity.getBody();
                 System.out.println("-------------------------" + response);
                 return response;
             }else {

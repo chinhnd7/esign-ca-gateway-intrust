@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.intrustca.esigncagateway.payload.request.GetCertRequest;
-import vn.intrustca.esigncagateway.payload.response.CertificateResponse;
+import vn.intrustca.esigncagateway.payload.response.GetCertResponse;
 import vn.intrustca.esigncagateway.service.GatewayService;
-import vn.intrustca.esigncagateway.utils.BaseDataRequest;
 import vn.intrustca.esigncagateway.utils.BaseDataResponse;
 import vn.intrustca.esigncagateway.utils.ResponseUtil;
 import vn.intrustca.esigncagateway.utils.exception.ServiceException;
@@ -44,8 +43,8 @@ public class GatewayController {
 //    }
 
     @PostMapping("/get_cert")
-    public ResponseEntity<BaseDataResponse<?>> getCert(@Valid @RequestBody BaseDataRequest<GetCertRequest> request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
-        CertificateResponse response = gatewayService.getCert(request.getBody(), httpRequest);
+    public ResponseEntity<BaseDataResponse<?>> getCerts(@Valid @RequestBody GetCertRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
+        GetCertResponse response = gatewayService.getCerts(request, httpRequest);
         return ResponseUtil.wrap(response);
     }
 }
