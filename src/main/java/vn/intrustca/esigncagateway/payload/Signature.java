@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Signature {
-    private String docId;
-    private String signatureValue;
-    private String timestampSignature;
+    private String doc_id;
+    private String signature_value;
+    private String timestamp_signature;
 }

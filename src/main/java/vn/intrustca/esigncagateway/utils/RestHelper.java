@@ -11,6 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -20,8 +21,11 @@ import vn.intrustca.esigncagateway.utils.exception.ValidationError;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -35,17 +39,17 @@ public class RestHelper {
     private RestTemplate restTemplate;
     private String endpoint;
 
-    public void init(String endpoint) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, UnrecoverableKeyException {
+    public void init(String endpoint, String urlKeyStore, String keyStorePassword) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, UnrecoverableKeyException {
         this.endpoint = endpoint;
-        String trustStorePassword = "bO4YFtgvruxv";
         KeyStore clientStore = KeyStore.getInstance("PKCS12");
         TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
-        clientStore.load(new FileInputStream("C:\\Intrust\\backup\\esign-ca-gateway\\src\\main\\resources\\client.keystore.p12"), trustStorePassword.toCharArray());
+        File file = ResourceUtils.getFile(urlKeyStore);
+        clientStore.load(Files.newInputStream(file.toPath()), keyStorePassword.toCharArray());
 
         SSLContext sslContext = SSLContextBuilder.create()
                 .setProtocol("TLSv1.2")
-                .loadKeyMaterial(clientStore, trustStorePassword.toCharArray())
+                .loadKeyMaterial(clientStore, keyStorePassword.toCharArray())
                 .loadTrustMaterial(null, acceptingTrustStrategy)
                 .build();
 
@@ -59,7 +63,7 @@ public class RestHelper {
         this.restTemplate =  new RestTemplate(requestFactory);
     }
 
-    public <T, G> T callService(String apiPath, G request, String token, HttpServletRequest httpServletRequest,  Class<T> responseClass) {
+    public <T, G> T callRaService(String apiPath, G request, String token, HttpServletRequest httpServletRequest,  Class<T> responseClass) {
         try{
             ResponseEntity<T> responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createAuthHttpEntity(request, token, httpServletRequest), responseClass);
             if (responseEntity.getStatusCodeValue() == 200) {

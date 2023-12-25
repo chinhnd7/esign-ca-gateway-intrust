@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class GetCertResponse {
-    private String transactionId;
+    private String transaction_id;
 
-    private List<UserCertificate> userCertificates;
+    private List<UserCertificate> user_certificates;
 }

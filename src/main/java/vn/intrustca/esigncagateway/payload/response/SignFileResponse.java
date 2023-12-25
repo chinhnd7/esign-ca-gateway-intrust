@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SignatureResponse {
-    private String transactionId;
+public class SignFileResponse {
+    private String transaction_id;
     private List<Signature> signatures;
 }
