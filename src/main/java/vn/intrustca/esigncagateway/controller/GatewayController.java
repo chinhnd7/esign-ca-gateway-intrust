@@ -3,6 +3,7 @@ package vn.intrustca.esigncagateway.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import vn.intrustca.esigncagateway.payload.request.GetCertRequest;
 import vn.intrustca.esigncagateway.payload.request.SignFileRequest;
@@ -25,14 +26,14 @@ public class GatewayController {
     private GatewayService gatewayService;
 
     @PostMapping("/get_cert")
-    public ResponseEntity<BaseDataResponse<?>> getCerts(@Valid @RequestBody GetCertRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
-        GetCertResponse response = gatewayService.getCerts(request, httpRequest);
+    public ResponseEntity<BaseDataResponse<?>> getCerts(@Valid @RequestBody GetCertRequest request, HttpServletRequest httpRequest, BindingResult bindingResult) throws JsonProcessingException, ServiceException {
+        GetCertResponse response = gatewayService.getCerts(request, httpRequest, bindingResult);
         return ResponseUtil.wrap(response);
     }
 
     @PostMapping("/sign_file")
-    public ResponseEntity<BaseDataResponse<?>> signFile(@Valid @RequestBody SignFileRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException, ExecutionException, InterruptedException, TimeoutException {
-        SignFileResponse response = gatewayService.signFile(request, httpRequest);
+    public ResponseEntity<BaseDataResponse<?>> signFile(@Valid @RequestBody SignFileRequest request, HttpServletRequest httpRequest, BindingResult bindingResult) throws JsonProcessingException, ServiceException, ExecutionException, InterruptedException, TimeoutException {
+        SignFileResponse response = gatewayService.signFile(request, httpRequest, bindingResult);
         return ResponseUtil.wrap(response);
     }
 }

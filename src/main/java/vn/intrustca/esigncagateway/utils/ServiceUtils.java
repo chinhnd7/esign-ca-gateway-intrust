@@ -16,10 +16,10 @@ public class ServiceUtils {
         List<UserCertificate> listUserCerts = new ArrayList<>();
         for (RaUserCertificate cert : responseCerts) {
             UserCertificate userCertificate = new UserCertificate();
-            userCertificate.setCert_id(cert.getCertificateId());
-            userCertificate.setCert_data(cert.getBase64Certificate());
-            userCertificate.setChain_data(new ChainData(DefaultValue.CA_CERT, DefaultValue.ROOT_CERT));
-            userCertificate.setSerial_number(cert.getCertificateSerialNumber());
+            userCertificate.setCertId(cert.getCertificateId());
+            userCertificate.setCertData(cert.getBase64Certificate());
+            userCertificate.setChainData(new ChainData(DefaultValue.CA_CERT, DefaultValue.ROOT_CERT));
+            userCertificate.setSerialNumber(cert.getCertificateSerialNumber());
             listUserCerts.add(userCertificate);
         }
         return listUserCerts;

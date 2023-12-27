@@ -1,5 +1,6 @@
 package vn.intrustca.esigncagateway.payload;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class UserCertificate {
-    private int cert_id;
-    private String cert_data;
-    private ChainData chain_data;
-    private String serial_number;
+    @JsonProperty("cert_id")
+    private int certId;
+    @JsonProperty("cert_data")
+    private String certData;
+    @JsonProperty("chain_data")
+    private ChainData chainData;
+    @JsonProperty("serial_number")
+    private String serialNumber;
 }

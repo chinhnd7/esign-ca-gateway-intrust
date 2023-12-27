@@ -6,9 +6,7 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -19,25 +17,24 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import vn.intrustca.esigncagateway.payload.RaUserCertificate;
 import vn.intrustca.esigncagateway.payload.response.IdpSignFileResponse;
-import vn.intrustca.esigncagateway.utils.exception.AppException;
-import vn.intrustca.esigncagateway.utils.exception.ValidationError;
+import vn.intrustca.esigncagateway.utils.exception.BusinessException;
+import vn.intrustca.esigncagateway.utils.exception.ExceptionCode;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicReference;
 
 @PropertySource("classpath:application.properties")
 public class RestHelper {
@@ -76,16 +73,15 @@ public class RestHelper {
             } else if (DefaultValue.IDP_SERVICE.equals(service)) {
                 responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createIdpAuthHttpEntity(request, authValue, httpServletRequest), responseClass);
             }
-            if (responseEntity.getStatusCodeValue() == 200) {
-                T response = responseEntity.getBody();
-                return response;
+            if (Objects.requireNonNull(responseEntity).getStatusCodeValue() == 200) {
+                return responseEntity.getBody();
             } else {
                 System.out.println(responseEntity);
+                throw new BusinessException(ExceptionCode.LOGIN_FAIL);
             }
         } catch (HttpClientErrorException e) {
-            throw new AppException(e.getRawStatusCode(), e.getMessage());
+            throw new BusinessException(ExceptionCode.INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
     public <G> List<RaUserCertificate> getCerts(String apiPath, G request, String token, HttpServletRequest httpServletRequest) {
@@ -93,43 +89,33 @@ public class RestHelper {
         try {
             responseEntity = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createRaAuthHttpEntity(request, token, httpServletRequest), new ParameterizedTypeReference<List<RaUserCertificate>>() {
             });
-            if (responseEntity.getStatusCodeValue() == 200) {
-                List<RaUserCertificate> response = responseEntity.getBody();
-
-                return response;
+            if (responseEntity.getStatusCodeValue() == 200 && !Objects.requireNonNull(responseEntity.getBody()).isEmpty()) {
+                return responseEntity.getBody();
             } else {
                 System.out.println(responseEntity);
+                throw new BusinessException(ExceptionCode.CERT_NOT_FOUND);
             }
         } catch (HttpClientErrorException e) {
-            throw new AppException(e.getRawStatusCode(), e.getMessage());
+            throw new BusinessException(ExceptionCode.INTERNAL_SERVER_ERROR);
         }
-
-        throw new AppException(responseEntity.getStatusCodeValue(), ValidationError.NotFound);
     }
 
     public <G> IdpSignFileResponse signFile(String apiPath, G request, String token, HttpServletRequest httpServletRequest) {
-        IdpSignFileResponse idpSignFileResponse = null;
-        // Create a Callable (Function B)
+        IdpSignFileResponse idpSignFileResponse;
+        // Create a Callable (Function Sign)
         Callable<IdpSignFileResponse> functionB = () -> {
             ResponseEntity<IdpSignFileResponse> signFileResponse = this.restTemplate.exchange(this.endpoint + apiPath, HttpMethod.POST, this.createIdpAuthHttpEntity(request, token, httpServletRequest), IdpSignFileResponse.class);
-
             return signFileResponse.getBody();
         };
-        // Create a FutureTask to hold the result of Function B
+        // Create a FutureTask to hold the result of Function Sign
         FutureTask<IdpSignFileResponse> futureTask = new FutureTask<>(functionB);
-        // Start a new thread to execute Function B
+        // Start a new thread to execute Function Sign
         new Thread(futureTask).start();
-
         try {
-            // Wait for the result of Function B
-            System.out.println("start");
+            // Wait for the result of Function Sign
             idpSignFileResponse = futureTask.get();
-            System.out.println("end");
-            return idpSignFileResponse;
-
         } catch (InterruptedException | ExecutionException e) {
-            // Handle exceptions if necessary
-            e.printStackTrace();
+            throw new BusinessException(ExceptionCode.INTERNAL_SERVER_ERROR);
         }
         return idpSignFileResponse;
     }
@@ -149,7 +135,7 @@ public class RestHelper {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.add("user-agent", DefaultValue.IDP_USER_AGENT);
         if (authValue.equals(DefaultValue.IDP_NEAC_AUTH_LOGIN)) {
-            byte[] encodedAuth = Base64Utils.encode(authValue.getBytes(Charset.forName("US-ASCII")));
+            byte[] encodedAuth = Base64Utils.encode(authValue.getBytes(StandardCharsets.US_ASCII));
             String authHeader = "Basic " + new String(encodedAuth);
             headers.set("Authorization", authHeader);
         } else {
