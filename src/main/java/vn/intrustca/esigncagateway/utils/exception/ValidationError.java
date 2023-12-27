@@ -33,6 +33,6 @@ public @interface ValidationError {
 
     String s3upload = "validation.constraints.s3Upload";
     String authentication = "validation.constraints.authentication";
-    String raAuthentication = "validation.fail.authentication";
+    String caAuthentication = "validation.fail.authentication";
 
 }

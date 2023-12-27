@@ -1,5 +1,6 @@
 package vn.intrustca.esigncagateway.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,11 +12,24 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class SignFileRequest {
+    @JsonProperty("sp_id")
     private String spId;
+
+    @JsonProperty("sp_password")
     private String spPassword;
+
+    @JsonProperty("user_id")
     private String userId;
+
+    @JsonProperty("sign_files")
     private List<File> listFiles;
+
+    @JsonProperty("transaction_id")
     private String transactionId;
+
+    @JsonProperty("serial_number")
     private String serialNumber;
+
+    @JsonProperty("time_stamp")
     private String timeStamp;
 }

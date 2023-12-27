@@ -1,5 +1,6 @@
 package vn.intrustca.esigncagateway.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class SignFileResponse {
-    private String transaction_id;
+    @JsonProperty("transaction_id")
+    private String transactionId;
     private List<Signature> signatures;
 }

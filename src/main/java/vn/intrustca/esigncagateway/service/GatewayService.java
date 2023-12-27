@@ -6,13 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import vn.intrustca.esigncagateway.payload.ChainData;
-import vn.intrustca.esigncagateway.payload.RaUserCertificate;
-import vn.intrustca.esigncagateway.payload.UserCertificate;
+import vn.intrustca.esigncagateway.payload.*;
 import vn.intrustca.esigncagateway.payload.request.*;
-import vn.intrustca.esigncagateway.payload.response.GetCertResponse;
-import vn.intrustca.esigncagateway.payload.response.RaLoginResponse;
-import vn.intrustca.esigncagateway.payload.response.SignFileResponse;
+import vn.intrustca.esigncagateway.payload.response.*;
+import vn.intrustca.esigncagateway.utils.DefaultValue;
 import vn.intrustca.esigncagateway.utils.RestHelper;
 import vn.intrustca.esigncagateway.utils.ServiceUtils;
 import vn.intrustca.esigncagateway.utils.exception.ServiceException;
@@ -40,10 +37,6 @@ public class GatewayService {
     private String raKeyStorePassword;
     @Value("${idp.endpoint}")
     private String idpEndpoint;
-    @Value("${idp.username}")
-    private String idpUserName;
-    @Value("${idp.password}")
-    private String idpPassword;
     @Value("${idp.key.store}")
     private String idpKeyStore;
     @Value("${idp.key.store.password}")
@@ -56,15 +49,15 @@ public class GatewayService {
             RestHelper restHelper = new RestHelper();
             restHelper.init(raEndpoint, raKeyStore, raKeyStorePassword);
 
-            RaLoginResponse loginResponse = restHelper.callRaService("auth/signin", loginRequest, null, httpRequest, RaLoginResponse.class);
+            RaLoginResponse loginResponse = restHelper.callCaService("auth/signin", loginRequest, null, httpRequest, RaLoginResponse.class, DefaultValue.RA_SERVICE);
             if(loginResponse.getCode() == 0){
                 RaGetCertRequest raGetCertRequest = new RaGetCertRequest(request.getUserId());
                 List<RaUserCertificate> responseCerts = restHelper.getCerts("getcertuser", raGetCertRequest, loginResponse.getAccessToken(), httpRequest);
-                response.setUser_certificates(ServiceUtils.adaptRaResponseToNeac(responseCerts));
-                response.setTransaction_id(request.getTransactionId());
+                response.setUserCertificates(ServiceUtils.adaptRaCertResponseToNeac(responseCerts));
+                response.setTransactionId(request.getTransactionId());
             }else {
                 throw ServiceExceptionBuilder.newBuilder()
-                        .addError(HttpStatus.UNAUTHORIZED, new ValidationErrorResponse("raAuthentication", ValidationError.raAuthentication))
+                        .addError(HttpStatus.UNAUTHORIZED, new ValidationErrorResponse("caAuthentication", ValidationError.caAuthentication))
                         .build();
             }
         } catch (Exception e) {
@@ -78,11 +71,24 @@ public class GatewayService {
     public SignFileResponse signFile(SignFileRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
         SignFileResponse response = new SignFileResponse();
         try {
-            IdpLoginRequest loginRequest = new IdpLoginRequest(true, "SAP", "");
+            IdpLoginRequest loginRequest = new IdpLoginRequest(true, "SAP", DefaultValue.IDP_NEAC_DEVICE);
             RestHelper restHelper = new RestHelper();
             restHelper.init(idpEndpoint, idpKeyStore, idpKeyStorePassword);
-
-            // todo
+            IdpLoginResponse loginResponse = restHelper.callCaService("users/auth/login", loginRequest, DefaultValue.IDP_NEAC_AUTH_LOGIN, httpRequest, IdpLoginResponse.class, DefaultValue.IDP_SERVICE);
+            if(loginResponse.getCode() == 0){
+                List<String> listHash = new ArrayList<>();
+                for (File file : request.getListFiles()) {
+                    listHash.add(file.getDataToBeSigned());
+                }
+                IdpSignFileRequest idpSignFileRequest = new IdpSignFileRequest(request.getUserId(), request.getSerialNumber(), listHash.size(), listHash, DefaultValue.KEY_PASS);
+                IdpSignFileResponse responseSignatures = restHelper.signFile("users/credentials/signHashNeac", idpSignFileRequest, loginResponse.getAccessToken(), httpRequest);
+                response.setSignatures(ServiceUtils.adaptIdpSignatureResponseToNeac(request, responseSignatures));
+                response.setTransactionId(request.getTransactionId());
+            }else {
+                throw ServiceExceptionBuilder.newBuilder()
+                        .addError(HttpStatus.UNAUTHORIZED, new ValidationErrorResponse("caAuthentication", ValidationError.caAuthentication))
+                        .build();
+            }
         } catch (Exception e) {
             throw ServiceExceptionBuilder.newBuilder()
                     .addError(HttpStatus.NOT_FOUND, new ValidationErrorResponse("certNotFound", ValidationError.NotFound))
@@ -91,16 +97,14 @@ public class GatewayService {
         return response;
     }
 
-    private List<UserCertificate> adaptRaResponseToNeac (List<RaUserCertificate> responseCerts) {
-        List<UserCertificate> listUserCerts = new ArrayList<>();
-        for (RaUserCertificate cert : responseCerts) {
-            UserCertificate userCertificate = new UserCertificate();
-            userCertificate.setCert_id(cert.getCertificateId());
-            userCertificate.setCert_data(cert.getBase64Certificate());
-            userCertificate.setChain_data(new ChainData());
-            userCertificate.setSerial_number(cert.getCertificateSerialNumber());
-            listUserCerts.add(userCertificate);
+    private List<Signature> adaptIdpSignatureResponseToNeac (SignFileRequest request, IdpSignFileResponse responseSignatures) {
+        List<Signature> listSignatures = new ArrayList<>();
+        for (String signatureIdp : responseSignatures.getSignatures()) {
+            Signature signature = new Signature();
+            signature.setSignatureValue(signatureIdp);
+
+            listSignatures.add(signature);
         }
-        return listUserCerts;
+        return listSignatures;
     }
 }

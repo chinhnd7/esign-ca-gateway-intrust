@@ -15,6 +15,8 @@ import vn.intrustca.esigncagateway.utils.exception.ServiceException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @RestController
 @RequestMapping("/gateway/ca")
@@ -29,7 +31,7 @@ public class GatewayController {
     }
 
     @PostMapping("/sign_file")
-    public ResponseEntity<BaseDataResponse<?>> signFile(@Valid @RequestBody SignFileRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException {
+    public ResponseEntity<BaseDataResponse<?>> signFile(@Valid @RequestBody SignFileRequest request, HttpServletRequest httpRequest) throws JsonProcessingException, ServiceException, ExecutionException, InterruptedException, TimeoutException {
         SignFileResponse response = gatewayService.signFile(request, httpRequest);
         return ResponseUtil.wrap(response);
     }

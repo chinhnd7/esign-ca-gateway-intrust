@@ -1,5 +1,6 @@
 package vn.intrustca.esigncagateway.payload;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Signature {
-    private String doc_id;
-    private String signature_value;
-    private String timestamp_signature;
+    @JsonProperty("doc_id")
+    private String docId;
+
+    @JsonProperty("signature_value")
+    private String signatureValue;
+
+    @JsonProperty("timestamp_signature")
+    private String timestampSignature;
 }
